@@ -1,32 +1,33 @@
 // ** React Imports
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react'
 
 // ** MUI Imports
-import Box from '@mui/material/Box';
-import { Theme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box'
+import { Theme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Layout Imports
 // !Do not remove this Layout import
-import VerticalLayout from './VerticalLayout';
+import VerticalLayout from './VerticalLayout'
 
 // ** Navigation Imports
-import VerticalNavItems from '../Navigation/navigationItems';
+import VerticalNavItems from '../Navigation/navigationItems'
 
 // ** Component Import
 // import UpgradeToProButton from './components/UpgradeToProButton'
-import VerticalAppBarContent from './AppBarContent';
+import VerticalAppBarContent from './AppBarContent'
 
 // ** Hook Import
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '../../hooks/useSettings'
+import Router from 'next/router'
 
 interface Props {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const UserLayout = ({ children }: Props) => {
   // ** Hooks
-  const { settings, saveSettings } = useSettings();
+  const { settings, saveSettings } = useSettings()
 
   /**
    *  The below variable will hide the current layout menu at given screen size.
@@ -36,10 +37,13 @@ const UserLayout = ({ children }: Props) => {
    *  to know more about what values can be passed to this hook.
    *  ! Do not change this value unless you know what you are doing. It can break the template.
    */
-  const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-
-  
-
+  const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+  useEffect(()=>{
+    const keystoreFile= localStorage.getItem('keystoreFile')
+    if(keystoreFile == null || keystoreFile == undefined || keystoreFile == ''){
+      Router.push('/wallet/create')
+    }
+  })
   return (
     <VerticalLayout
       hidden={hidden}
@@ -47,7 +51,7 @@ const UserLayout = ({ children }: Props) => {
       saveSettings={saveSettings}
       verticalNavItems={VerticalNavItems()} // Navigation Items
       verticalAppBarContent={(
-        props, // AppBar Content
+        props // AppBar Content
       ) => (
         <VerticalAppBarContent
           hidden={hidden}
@@ -59,8 +63,7 @@ const UserLayout = ({ children }: Props) => {
     >
       {children}
     </VerticalLayout>
-    
-  );
-};
+  )
+}
 
-export default UserLayout;
+export default UserLayout

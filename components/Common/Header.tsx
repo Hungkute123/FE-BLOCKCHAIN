@@ -74,7 +74,6 @@ export const Header = () => {
                   <Button
                     {...bindTrigger(popupState)}
                     sx={{ border: '1px solid var(--green-primary-base)' }}
-                    startIcon
                   >
                     MEW Hub
                   </Button>

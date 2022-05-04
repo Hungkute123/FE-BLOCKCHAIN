@@ -1,72 +1,82 @@
-import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Slide from '@mui/material/Slide';
-import Toolbar from '@mui/material/Toolbar';
-import CloseIcon from '@mui/icons-material/Close';
-import { TransitionProps } from '@mui/material/transitions';
-import Typography from '@mui/material/Typography';
-import React from 'react';
-import { Box } from '@mui/system';
-import { Paper } from '@mui/material';
-import { CardItem } from '../Common/CardItem';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepButton from '@mui/material/StepButton';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { KeystoreFileStepOne } from './KeystoreFileStepOne';
-import { KeystoreFileStepTwo } from './KeystoreFileStepTwo';
-import { KeystoreFileStepThree } from './KeystoreFileStepThree';
-const steps = ['STEP 1. Create password', 'STEP 2. Download keystore file', 'STEP 3. Well done'];
+import AppBar from '@mui/material/AppBar'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import Slide from '@mui/material/Slide'
+import Toolbar from '@mui/material/Toolbar'
+import CloseIcon from '@mui/icons-material/Close'
+import { TransitionProps } from '@mui/material/transitions'
+import Typography from '@mui/material/Typography'
+import React, { useState } from 'react'
+import { Box } from '@mui/system'
+import { Paper } from '@mui/material'
+import { CardItem } from '../Common/CardItem'
+import Stepper from '@mui/material/Stepper'
+import Step from '@mui/material/Step'
+import StepButton from '@mui/material/StepButton'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { KeystoreFileStepOne } from './KeystoreFileStepOne'
+import { KeystoreFileStepTwo } from './KeystoreFileStepTwo'
+import { KeystoreFileStepThree } from './KeystoreFileStepThree'
+import axios from 'axios'
+const steps = ['STEP 1. Create password', 'STEP 2. Download keystore file', 'STEP 3. Well done']
 interface IKeystoreFile {
-  open: any;
-  handleClose: any;
+  open: any
+  handleClose: any
 }
 const methodCreateWallet = [
   {
     id: 'software',
-    title: 'Software',
+    title: 'Notice',
     subscript:
-      ' Software methods like keystore file and mnemonic phrase should only be used in offline settings by experienced users. ',
+      'This information is sensitive, and these options should only be used in offline settings by experienced crypto users. You will need your keystore file + password to access your wallet. Please save them in a secure location. We CAN NOT retrieve or reset your keystore/password if you lose them.',
     icon: '',
     img: '',
-    warning: 'NOT RECOMMENDED',
-  },
-];
+    warning: 'NOT RECOMMENDED'
+  }
+]
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement;
+    children: React.ReactElement
   },
-  ref: React.Ref<unknown>,
+  ref: React.Ref<unknown>
 ) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+  return <Slide direction='up' ref={ref} {...props} />
+})
 export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [keystore, setKeyStore] = useState({})
+  const [values, setValues] = React.useState({
+    password: '',
+    isPassword: true,
+    confirmPassword: '',
+    isConfirmPassword: true,
+    showPassword: false,
+    showConfirmPassword: false
+  })
+  const [activeStep, setActiveStep] = React.useState(0)
   const [completed, setCompleted] = React.useState<{
-    [k: number]: boolean;
-  }>({});
+    [k: number]: boolean
+  }>({})
 
   const totalSteps = () => {
-    return steps.length;
-  };
+    return steps.length
+  }
 
   const completedSteps = () => {
-    return Object.keys(completed).length;
-  };
+    return Object.keys(completed).length
+  }
 
   const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
-  };
+    return activeStep === totalSteps() - 1
+  }
 
   const allStepsCompleted = () => {
-    return completedSteps() === totalSteps();
-  };
+    return completedSteps() === totalSteps()
+  }
 
   const handleNext = () => {
     const newActiveStep =
@@ -74,42 +84,82 @@ export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => 
         ? // It's the last step, but not all steps have been completed,
           // find the first step that has been completed
           steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-  };
+        : activeStep + 1
+    setActiveStep(newActiveStep)
+  }
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
+    setActiveStep(prevActiveStep => prevActiveStep - 1)
+  }
+  const handleBackStepOne = () => {
+    setActiveStep(prevActiveStep => prevActiveStep - 2)
+  }
   const handleStep = (step: number) => () => {
-    setActiveStep(step);
-  };
+    setActiveStep(step)
+  }
 
   const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
+    const newCompleted = completed
+    newCompleted[activeStep] = true
+    setCompleted(newCompleted)
+    handleNext()
+  }
 
   const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
+    setActiveStep(0)
+    setCompleted({})
+  }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+
+    axios
+      .post(`${process.env.URL_MY_API}wallet/create/keystore`, {
+        version: 1,
+        address: 'Sadec',
+        password: values.password
+      })
+      .then(function (response: any) {
+        setKeyStore({ response })
+        handleComplete()
+      })
+      .catch(function (error: any) {
+        console.log(error)
+      })
+  }
   const renderStep = (activeStep: number, handleComplete) => {
     switch (activeStep + 1) {
       case 1:
-        return <KeystoreFileStepOne handleComplete={handleComplete} />;
+        return (
+          <KeystoreFileStepOne
+            handleComplete={handleComplete}
+            handleSubmit={handleSubmit}
+            values={values}
+            setValues={setValues}
+            key={'handlesubmit'}
+          />
+        )
       case 2:
-        return <KeystoreFileStepTwo handleComplete={handleComplete} />;
+        return (
+          <KeystoreFileStepTwo
+            handleComplete={handleComplete}
+            handleBack={handleBack}
+            keystoreData={keystore}
+            key={'handledowload'}
+          />
+        )
       case 3:
-        return <KeystoreFileStepThree />;
+        return (
+          <KeystoreFileStepThree
+            handleComplete={handleComplete}
+            handleBackStepOne={handleBackStepOne}
+            key={'handlepush'}
+          />
+        )
 
       default:
-        return <></>;
+        return <></>
     }
-  };
+  }
   return (
     <>
       <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
@@ -133,7 +183,7 @@ export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => 
                 height: '56px',
                 top: '0px',
                 position: 'fixed',
-                left: 0,
+                left: 0
               }}
               onClick={handleClose}
             >
@@ -146,47 +196,44 @@ export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => 
                 height: '56px',
                 top: '0px',
                 position: 'fixed',
-                right: 0,
+                right: 0
               }}
               onClick={handleClose}
             >
               <CloseIcon sx={{ color: '#706666' }} />
             </Button>
           </div>
-          <div style={{display: 'block'}}>
-          <Paper
-            sx={{
-              minHeight: '300px',
-              width: '650px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              borderRadius: '10px',
-              paddingBottom: '15px',
-              paddingLeft: '28px',
-              paddingRight: '28px',
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: '700', marginTop: '20px', marginBottom: '20px' }}
+          <div style={{ display: 'block' }}>
+            <Paper
+              sx={{
+                minHeight: '300px',
+                width: '650px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                borderRadius: '10px',
+                paddingBottom: '15px',
+                paddingLeft: '28px',
+                paddingRight: '28px'
+              }}
             >
-              Create Wallet with Keystore File
-            </Typography>
-            <Box sx={{ width: '100%', marginTop: '10px' }}>
-              <Stepper nonLinear activeStep={activeStep} alternativeLabel>
-                {steps.map((label, index) => (
-                  <Step key={label} completed={completed[index]}>
-                    <StepButton color="inherit" onClick={handleStep(index)}>
-                      {label}
-                    </StepButton>
-                  </Step>
-                ))}
-              </Stepper>
-              <div>
-                {renderStep(activeStep, handleComplete)}
-                {/* {allStepsCompleted() ? (
+              <Typography variant='h5' sx={{ fontWeight: '700', marginTop: '20px', marginBottom: '20px' }}>
+                Create Wallet with Keystore File
+              </Typography>
+              <Box sx={{ width: '100%', marginTop: '10px' }}>
+                <Stepper nonLinear activeStep={activeStep} alternativeLabel>
+                  {steps.map((label, index) => (
+                    <Step key={label} completed={completed[index]}>
+                      <StepButton color='inherit' onClick={handleStep(index)}>
+                        {label}
+                      </StepButton>
+                    </Step>
+                  ))}
+                </Stepper>
+                <div>
+                  {renderStep(activeStep, handleComplete)}
+                  {/* {allStepsCompleted() ? (
                   <React.Fragment>
                     <Typography sx={{ mt: 2, mb: 1 }}>
                       All steps completed - you&apos;re finished
@@ -225,26 +272,26 @@ export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => 
                     </Box>
                   </React.Fragment>
                 )} */}
-              </div>
-            </Box>
+                </div>
+              </Box>
 
-            <div style={{ display: 'block' }}>
-              {methodCreateWallet.map((item: any, index: number) => {
-                switch (index) {
-                  case 2:
-                    return <CardItem item={item} borderColor="#ccc" />;
-                  default:
-                    return <CardItem item={item} borderColor="#ccc" />;
-                }
-              })}
-            </div>
-          </Paper>
+              <div style={{ display: 'block' }}>
+                {methodCreateWallet.map((item: any, index: number) => {
+                  switch (index) {
+                    case 2:
+                      return <CardItem item={item} borderColor='#ccc' key={index + 10} />
+                    default:
+                      return <CardItem item={item} borderColor='#ccc' key={index + 10} />
+                  }
+                })}
+              </div>
+            </Paper>
           </div>
-          <Typography variant="subtitle1" sx={{ fontSize: '12px', margin: ' 20px 0 20px 0' }}>
+          <Typography variant='subtitle1' sx={{ fontSize: '12px', margin: ' 20px 0 20px 0' }}>
             Need help? Contact support
           </Typography>
         </Box>
       </Dialog>
     </>
-  );
-};
+  )
+}

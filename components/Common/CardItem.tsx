@@ -6,6 +6,7 @@ interface ICardItem {
   onClick?: any;
   borderColor?: string;
   backgroundColor?: string;
+  color?: string;
   warningPosition?: string;
 }
 export const CardItem: React.FC<ICardItem> = ({
@@ -13,6 +14,7 @@ export const CardItem: React.FC<ICardItem> = ({
   onClick,
   borderColor = '#fff',
   backgroundColor = '#fff',
+  color = '#000',
   warningPosition,
 }) => {
   return (
@@ -84,8 +86,8 @@ export const CardItem: React.FC<ICardItem> = ({
                 >
                   {item.warning}
                 </Typography>
-                <Typography sx={{ fontWeight: '600' }}>{item.title}</Typography>
-                <Typography sx={{ fontSize: '14px' }}>{item.subscript}</Typography>
+                <Typography sx={{ fontWeight: '600',color: `${color}` }}>{item.title}</Typography>
+                <Typography sx={{ fontSize: '14px',color: `${color}` }}>{item.subscript}</Typography>
               </Grid>
             )}
           </Grid>

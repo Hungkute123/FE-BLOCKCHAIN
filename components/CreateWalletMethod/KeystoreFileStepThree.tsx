@@ -3,10 +3,12 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import { CardItemTypeTwo } from '../Common/CardItemTypeTwo';
 import Grid from '@mui/material/Grid';
-interface IKeystoreFileStepTwo {
+import Link from 'next/link';
+interface IKeystoreFileStepThree {
   handleComplete: any;
+  handleBackStepOne: any;
 }
-export const KeystoreFileStepThree = () => {
+export const KeystoreFileStepThree:React.FC<IKeystoreFileStepThree> = ({handleBackStepOne, handleComplete}) => {
   return (
     <>
       <Box
@@ -24,7 +26,8 @@ export const KeystoreFileStepThree = () => {
                 keystore file should only be used in an offline setting.
               </Typography>
 
-              <button
+             <Link href="/wallet/access">
+             <button
                 style={{
                   width: '100%',
                   borderRadius: '10px',
@@ -41,7 +44,7 @@ export const KeystoreFileStepThree = () => {
                 }}
               >
                 Access Wallet
-              </button>
+              </button></Link>
               <button
                 style={{
                   width: '100%',
@@ -57,6 +60,7 @@ export const KeystoreFileStepThree = () => {
                   fontWeight: '400',
                   fontSize: '14px'
                 }}
+                onClick={handleBackStepOne}
               >
                 Create Another Wallet
               </button>

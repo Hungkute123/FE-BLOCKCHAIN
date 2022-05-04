@@ -6,7 +6,7 @@ export const Footer = () => {
     <>
       <Grid container sx={{ height: '60px', padding: '15px', display: 'flex', alignItems: 'center' }}>
         <Grid item xs={8} sx={{ fontSize: '14px', color: '#000' }}>
-          ©2022 MyEtherWallet. All rights reserved. Pricing taken from CoinGecko
+        © 2022 MyEtherWallet. All rights reserved. Developed by Nguyễn Đình Hùng.
         </Grid>
         <Grid item xs={4}>
           <div style={{ float: 'right', marginRight: '30px' }}>

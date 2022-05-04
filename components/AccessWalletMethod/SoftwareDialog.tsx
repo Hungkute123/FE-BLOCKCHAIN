@@ -133,10 +133,11 @@ export const SoftwareDialog: React.FC<ISoftwareDialog> = ({ open, handleClose })
                         item={item}
                         borderColor="#ccc"
                         onClick={handleClickOpenCreateWithKeystoreFile}
+                        key={index}
                       />
                     );
                   default:
-                    return <CardItem item={item} borderColor="#ccc" />;
+                    return <CardItem item={item} borderColor="#ccc" key={"carditem"}/>;
                 }
               })}
             </Box>

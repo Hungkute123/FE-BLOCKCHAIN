@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Dashboard = () => {
-  return <>hahahah</>
+  return <>dashboard</>
 }
 
 export default Dashboard

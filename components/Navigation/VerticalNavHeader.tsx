@@ -1,9 +1,9 @@
 // ** React Import
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
-
+import Router from 'next/router'
 // ** MUI Imports
 import Box, { BoxProps } from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
@@ -20,6 +20,7 @@ import { Settings } from '../../context/settingsContext'
 import themeConfig from '../../configs/themeConfig'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
+import { Tooltip } from '@mui/material'
 
 interface Props {
   hidden: boolean
@@ -72,13 +73,27 @@ const VerticalNavHeader = (props: Props) => {
 
   // ** Hooks
   const theme = useTheme()
-
+  const [publicKey, setPublicKey] = useState('0000000000000000000000000000000')
+  const [headKey, setHeadKey] = useState('000000')
+  const [tailKey, setTailKey] = useState('0000')
+  useEffect(() => {
+    const keystoreFile: any = JSON.parse(localStorage.getItem('keystoreFile'))
+    console.log(keystoreFile)
+    if (keystoreFile.keyPair != undefined && keystoreFile.keyPair.publicKey != undefined) {
+      setPublicKey(keystoreFile.keyPair.publicKey)
+      const length = publicKey.length
+      const head = publicKey.slice(0, 6)
+      const tail = publicKey.slice(length - 5, length - 1)
+      setHeadKey(head)
+      setTailKey(tail)
+    }
+  }, [publicKey])
   return (
     <MenuHeaderWrapper className='nav-header' sx={{ pl: 6, width: '296px' }}>
       {userVerticalNavMenuBranding ? (
         userVerticalNavMenuBranding(props)
       ) : (
-        <Link href='/' passHref>
+        <Link href='/wallet/transaction' passHref>
           <StyledLink>
             <img
               src='https://www.myetherwallet.com/img/logo-mew.f6482e98.svg'
@@ -95,7 +110,11 @@ const VerticalNavHeader = (props: Props) => {
         <Typography sx={{ color: '#fff', fontSize: '14px', margin: '12px 10px 10px 15px', fontWeight: 500 }}>
           MY PERSONAL ACCOUNT
         </Typography>
-        <Typography sx={{ color: '#fff', fontSize: '12px', marginLeft: '15px' }}>nigfnfugnunuigneuỉntunủng</Typography>
+        <Tooltip title={`${publicKey}`} placement="top" sx={{backgroundColor: '#fff'}}>
+            <Typography sx={{ color: '#fff', fontSize: '12px', marginLeft: '15px' }}>
+          {headKey}...{tailKey}
+        </Typography>
+          </Tooltip>
         <Typography sx={{ color: '#fff', fontSize: '30px', margin: '20px 10px 10px 15px', fontWeight: 600 }}>
           $0.00
         </Typography>
@@ -148,7 +167,12 @@ const VerticalNavHeader = (props: Props) => {
         </Grid>
         <Grid item>
           <Box sx={{ display: 'flex', borderRight: '1px solid #ccc', padding: '0 10px' }}>
-            <Button sx={{ textTransform: 'capitalize', display: 'flex', flexDirection: 'column' }}>
+            <Button
+              sx={{ textTransform: 'capitalize', display: 'flex', flexDirection: 'column' }}
+              onClick={() => {
+                Router.push('/wallet/send-tx')
+              }}
+            >
               <i>
                 <IosShareIcon sx={{ color: 'var(--green-primary-base)' }} />
               </i>

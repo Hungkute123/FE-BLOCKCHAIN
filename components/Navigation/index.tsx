@@ -114,14 +114,14 @@ const Navigation = (props: Props) => {
           
         }}
       />
-      <Box sx={{ height: '100%', position: 'relative', overflowX: 'scroll', backgroundColor: '#071e40' }}>
+      <Box sx={{ height: '100%', position: 'relative', backgroundColor: '#071e40', overflowY: 'scroll',scrollBehavior: 'smooth' }}>
         {/* @ts-ignore */}
         <ScrollWrapper
           containerRef={(ref: any) => handleInfiniteScroll(ref)}
           {...(hidden
             ? {
                 onScroll: (container: any) => scrollMenu(container),
-                sx: { height: '100%', overflowY: 'auto', overflowX: 'scroll' },
+                sx: { height: '100%', overflowY: 'scroll', overflowX: 'scroll' },
               }
             : {
                 options: { wheelPropagation: false },

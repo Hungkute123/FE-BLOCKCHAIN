@@ -24,6 +24,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/wallet/dashboard'
     },
     {
+      title: 'Transaction',
+      icon: HomeOutline,
+      path: '/wallet/transaction'
+    },
+    {
       title: 'NFT Manager',
       icon: HomeOutline,
       path: '/wallet/nft'
@@ -38,39 +43,39 @@ const navigation = (): VerticalNavItemsType => {
       icon: SettingsEthernetIcon,
       path: '/wallet/deploy'
     },
-    {
-      title: 'Deploy Contract',
-      icon: SettingsEthernetIcon,
-      path: '/wallet/deploy'
-    },
-    {
-      title: 'Interact with Contract',
-      icon: SettingsEthernetIcon,
-      path: '/wallet/interact'
-    },
+    // {
+    //   title: 'Deploy Contract',
+    //   icon: SettingsEthernetIcon,
+    //   path: '/wallet/deploy'
+    // },
+    // {
+    //   title: 'Interact with Contract',
+    //   icon: SettingsEthernetIcon,
+    //   path: '/wallet/interact'
+    // },
     {
       title: 'Message',
       icon: ChatBubbleOutlineIcon,
       path: '/wallet/sign'
     },
-    {
-      title: 'Sign Message',
-      icon: HomeOutline,
-      path: '/wallet/sign'
-    },
-    {
-      title: 'Verify Message',
-      icon: HomeOutline,
-      path: '/wallet/verify'
-    },
+    // {
+    //   title: 'Sign Message',
+    //   icon: HomeOutline,
+    //   path: '/wallet/sign'
+    // },
+    // {
+    //   title: 'Verify Message',
+    //   icon: HomeOutline,
+    //   path: '/wallet/verify'
+    // },
     {
       title: 'Settings',
       icon: AccountCogOutline,
       path: '/wallet/settings'
     },
-    {
-      sectionTitle: 'Pages'
-    },
+    // {
+    //   sectionTitle: 'Pages'
+    // },
     {
       title: 'Logout',
       icon: LogoutIcon,

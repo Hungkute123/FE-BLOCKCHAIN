@@ -8,71 +8,79 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
-  Typography,
-} from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios';
+  Typography
+} from '@mui/material'
+import React, { useState, useEffect, useRef } from 'react'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import axios from 'axios'
 interface IKeystoreFileStepOne {
-  handleComplete: any;
+  handleComplete: any
+  readFile: any
 }
-export const KeystoreFileStepOne: React.FC<IKeystoreFileStepOne> = ({ handleComplete }) => {
-  const [isDisable, setIsDisable] = useState(true);
+export const KeystoreFileStepOne: React.FC<IKeystoreFileStepOne> = ({ handleComplete, readFile }) => {
+  const fileInputRef: any = useRef()
+  const [isDisable, setIsDisable] = useState(true)
   const handleMouseDownPassword = (event: any) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
   const [values, setValues] = React.useState({
     password: '',
     isPassword: true,
     confirmPassword: '',
     isConfirmPassword: true,
     showPassword: false,
-    showConfirmPassword: false,
-  });
+    showConfirmPassword: false
+  })
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    handleComplete();
-  };
+    e.preventDefault()
+    handleComplete()
+  }
 
   const handleChange = (prop: any) => (event: any) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+    setValues({ ...values, [prop]: event.target.value })
+  }
 
   const handleClickShowPassword = () => {
     setValues({
       ...values,
-      showPassword: !values.showPassword,
-    });
-  };
+      showPassword: !values.showPassword
+    })
+  }
   const handleClickShowConfirmPassword = () => {
     setValues({
       ...values,
-      showConfirmPassword: !values.showConfirmPassword,
-    });
-  };
+      showConfirmPassword: !values.showConfirmPassword
+    })
+  }
   useEffect(() => {
     if (values.password.length > 7) {
       if (values.password === values.confirmPassword) {
-        setIsDisable(false);
+        setIsDisable(false)
       } else {
-        setIsDisable(true);
+        setIsDisable(true)
       }
     }
-  }, [values.password, values.confirmPassword]);
+  }, [values.password, values.confirmPassword])
   return (
     <>
-      <Box
-        sx={{ display: 'flex', flexDirection: 'column' }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <input
+              onChange={(e: any) => {
+                const file = e.target.files[0];
+                readFile(file);
+              }}
+              multiple={false}
+              ref={fileInputRef}
+              type="file"
+              hidden
+              value=""
+              id="input-file"
+            />
         <Grid container>
           <Grid item xs={6}>
-            <Typography sx={{ color: '#9e9e9e', fontSize: '14px', fontWeight: '600' }}>
-              STEP 1.
-            </Typography>
-            <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>
-              Select your Keystore File
-            </Typography>
+            <Typography sx={{ color: '#9e9e9e', fontSize: '14px', fontWeight: '600' }}>STEP 1.</Typography>
+            <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>Select your Keystore File</Typography>
             <Typography sx={{ fontSize: '14px', fontWeight: '400' }}>
               Please select keystore file that unlocks your wallet.
             </Typography>
@@ -88,17 +96,23 @@ export const KeystoreFileStepOne: React.FC<IKeystoreFileStepOne> = ({ handleComp
                 color: 'var(--green-primary-base)',
                 marginTop: '20px',
                 fontWeight: '400',
-                fontSize: '14px',
+                fontSize: '14px'
               }}
+              onClick={() => {fileInputRef.current.click()}}
             >
               Access Wallet
             </button>
           </Grid>
           <Grid item xs={6}>
-            <div style={{display: 'flex', alignItems: 'flex-end', width: '100%', justifyContent: 'flex-end'}}><img src="https://www.myetherwallet.com/img/keystore-file.cd9a1369.jpg" style={{display: 'flex', height: '150px', width: '150px', alignItems: 'flex-end'}} /></div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', width: '100%', justifyContent: 'flex-end' }}>
+              <img
+                src='https://www.myetherwallet.com/img/keystore-file.cd9a1369.jpg'
+                style={{ display: 'flex', height: '150px', width: '150px', alignItems: 'flex-end' }}
+              />
+            </div>
           </Grid>
         </Grid>
       </Box>
     </>
-  );
-};
+  )
+}
