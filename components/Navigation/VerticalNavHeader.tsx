@@ -1,5 +1,5 @@
 // ** React Import
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -21,7 +21,15 @@ import themeConfig from '../../configs/themeConfig'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import { Tooltip } from '@mui/material'
+import axios from 'axios'
+import { WalletContext } from '../../context/walletContext'
+import Snackbar from '@mui/material/Snackbar'
+import MuiAlert, { AlertProps } from '@mui/material/Alert'
+import React from 'react'
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />
+})
 interface Props {
   hidden: boolean
   settings: Settings
@@ -68,6 +76,8 @@ const CardInformation = styled('div')({
   backgroundImage: 'url(https://mewcard.mewapi.io/?address=0x17ec911bf41234ae7297e1407f1e1a958a37d3c2)'
 })
 const VerticalNavHeader = (props: Props) => {
+  const wallet: any = useContext(WalletContext)
+  const [open, setOpen] = React.useState(false)
   // ** Props
   const { verticalNavMenuBranding: userVerticalNavMenuBranding } = props
 
@@ -76,18 +86,32 @@ const VerticalNavHeader = (props: Props) => {
   const [publicKey, setPublicKey] = useState('0000000000000000000000000000000')
   const [headKey, setHeadKey] = useState('000000')
   const [tailKey, setTailKey] = useState('0000')
+  const [balance, setBalance] = useState(0)
+
   useEffect(() => {
-    const keystoreFile: any = JSON.parse(localStorage.getItem('keystoreFile'))
-    console.log(keystoreFile)
-    if (keystoreFile.keyPair != undefined && keystoreFile.keyPair.publicKey != undefined) {
-      setPublicKey(keystoreFile.keyPair.publicKey)
-      const length = publicKey.length
-      const head = publicKey.slice(0, 6)
-      const tail = publicKey.slice(length - 5, length - 1)
-      setHeadKey(head)
-      setTailKey(tail)
+    console.log(wallet.publicKey)
+    setPublicKey(String(wallet.publicKey))
+    setBalance(wallet.balance)
+    const length = publicKey.length
+    const head = publicKey.slice(0, 6)
+    const tail = publicKey.slice(length - 5, length - 1)
+    setHeadKey(head)
+    setTailKey(tail)
+  }, [wallet.publicKey.length, publicKey, wallet.balance])
+
+  const handleClickCopy = () => {
+    navigator.clipboard.writeText(publicKey)
+    setOpen(true)
+  }
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return
     }
-  }, [publicKey])
+
+    setOpen(false)
+  }
+
   return (
     <MenuHeaderWrapper className='nav-header' sx={{ pl: 6, width: '296px' }}>
       {userVerticalNavMenuBranding ? (
@@ -110,17 +134,17 @@ const VerticalNavHeader = (props: Props) => {
         <Typography sx={{ color: '#fff', fontSize: '14px', margin: '12px 10px 10px 15px', fontWeight: 500 }}>
           MY PERSONAL ACCOUNT
         </Typography>
-        <Tooltip title={`${publicKey}`} placement="top" sx={{backgroundColor: '#fff'}}>
-            <Typography sx={{ color: '#fff', fontSize: '12px', marginLeft: '15px' }}>
-          {headKey}...{tailKey}
-        </Typography>
-          </Tooltip>
-        <Typography sx={{ color: '#fff', fontSize: '30px', margin: '20px 10px 10px 15px', fontWeight: 600 }}>
-          $0.00
+        <Tooltip title={`${publicKey}`} placement='top' sx={{ backgroundColor: '#fff' }}>
+          <Typography sx={{ color: '#fff', fontSize: '12px', marginLeft: '15px' }}>
+            {headKey}...{tailKey}
+          </Typography>
+        </Tooltip>
+        <Typography sx={{ color: '#fff', fontSize: '30px', margin: '20px 10px 10px 15px', fontWeight: 600 ,textOverflow: 'ellipsis', overflow: 'hidden', width: '200px',whiteSpace: 'nowrap'}}>
+          {balance} MC
         </Typography>
         <Grid container sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <Grid item xs={6}>
-            <Typography sx={{ color: '#fff', fontSize: '15px', marginLeft: '15px' }}>0 BNB</Typography>
+            <Typography sx={{ color: '#fff', fontSize: '15px', marginLeft: '15px',textOverflow: 'ellipsis', overflow: 'hidden', width: '150px',whiteSpace: 'nowrap' }}>{balance} MC</Typography>
           </Grid>
           <Grid item xs={6}>
             <Box sx={{ float: 'right', marginRight: '15px' }}>
@@ -147,9 +171,15 @@ const VerticalNavHeader = (props: Props) => {
                   minWidth: '32px',
                   width: '32px'
                 }}
+                onClick={handleClickCopy}
               >
                 <ContentCopyIcon sx={{ fontSize: '18px' }} />
               </Button>
+              <Snackbar open={open} autoHideDuration={4000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity='success' sx={{ width: '100%' }}>
+                Copy your address successfully
+                </Alert>
+              </Snackbar>
             </Box>
           </Grid>
         </Grid>

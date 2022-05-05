@@ -3,45 +3,138 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   MenuItem,
+  Slide,
   TextField,
   Typography
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { TokenValue } from '../../components/Info/TokenValue'
 import { Network } from '../../components/Info/Network'
+import { TransitionProps } from '@mui/material/transitions'
+import { WalletContext } from '../../context/walletContext'
+import axios from 'axios'
+import Router from 'next/router'
 const currencies = [
   {
-    value: 'USD',
-    label: '$'
-  },
-  {
-    value: 'EUR',
-    label: '€'
-  },
-  {
-    value: 'BTC',
-    label: '฿'
-  },
-  {
-    value: 'JPY',
-    label: '¥'
+    value: 'MC',
+    label: 'https://img.mewapi.io/?image=https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880'
   }
 ]
-const SendTX = () => {
-  const [currency, setCurrency] = React.useState('EUR')
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction='up' ref={ref} {...props} />
+})
+const SendTx = () => {
+  const wallet: any = useContext(WalletContext)
+  const [balance, setBalance] = useState(0)
+  const [publicKey, setPublicKey] = useState('0000000000000000000000000000000')
+  const [privateKey, setPrivateKey] = useState('0000000000000000000000000000000')
+  const [currency, setCurrency] = useState('MC')
+  const [values, setValues] = useState({
+    amount: 0,
+    toAddress: '',
+  })
+  useEffect(() => {
+    console.log(wallet.publicKey)
+    setPublicKey(String(wallet.publicKey))
+    setPrivateKey(String(wallet.privateKey))
+    setBalance(wallet.balance)
+  }, [wallet.publicKey.length, publicKey, wallet.balance, privateKey])
+  const [openDialogOne, setOpenDialogOne] = useState(false)
 
+  const handleClickOpenDialogOne = () => {
+    setOpenDialogOne(true)
+  }
+
+  const handleCloseDialogOne = () => {
+    setOpenDialogOne(false)
+  }
+  const [openDialogTwo, setOpenDialogTwo] = useState(false)
+
+  const handleClickOpenDialogTwo = () => {
+    setOpenDialogTwo(true)
+  }
+
+  const handleCloseDialogTwo = () => {
+    setOpenDialogTwo(false)
+  }
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrency(event.target.value)
   }
+  const handleChangeValues = (prop: any) => (event: any) => {
+    setValues({ ...values, [prop]: event.target.value })
+  }
+  const handleSend = async (e: any) => {
+    e.preventDefault()
+
+    axios
+      .post(`${process.env.URL_MY_API}wallet/tx/send-mc`, {
+        privateKey: privateKey,
+        toAddress: values.toAddress,
+        fromAddress: publicKey,
+        amount: values.amount,
+        txFee: values.amount*0.0142
+      })
+      .then(function (response: any) {
+        Router.push('/wallet/transactions')
+      })
+      .catch(function (error: any) {
+        console.log(error)
+      })
+      axios
+      .get(`${process.env.URL_MY_API}wallet/tx/mining?wallet=${publicKey}`)
+      .then(function (response: any) {
+        console.log(response)
+      })
+      .catch(function (error: any) {
+        console.log(error)
+      })
+  }
   return (
     <div style={{ backgroundColor: 'var(--gray-primary-base)', width: '100%' }}>
+      <Dialog
+        open={openDialogOne}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseDialogOne}
+        aria-describedby='alert-dialog-slide-description'
+      >
+        <DialogContent>
+          <Typography sx={{ fontWeight: 600, fontSize: '22px', color: '#000' }}>How are fees determined?</Typography>
+          <DialogContentText id='alert-dialog-slide-description' sx={{ fontSize: '14px', marginTop: '15px' }}>
+            Transaction fees are charged by MyCoin miners, not MEW. We can't influence them and we don't receive any
+            part of the transaction fees that you pay.
+          </DialogContentText>
+          <Typography sx={{ fontWeight: 600, fontSize: '22px', color: '#000', marginTop: '15px' }}>
+            What should I do?
+          </Typography>
+          <DialogContentText id='alert-dialog-slide-description' sx={{ fontSize: '14px', marginTop: '15px' }}>
+            Good news! You have options! If you’re not in a hurry, you can use the “Normal” setting and your transaction
+            will be mined at a later time. MEW supports MyCoin scaling solutions Polygon and Binance Smart Chain
+            (accessible on MEW web and Android). Consider using these chains to avoid congestion and save on fees. Learn
+            how here.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialogOne}>I know</Button>
+        </DialogActions>
+      </Dialog>
       <Box>
         <Grid container>
           <Grid item xs={8}>
@@ -73,39 +166,50 @@ const SendTX = () => {
                     >
                       {currencies.map(option => (
                         <MenuItem key={option.value} value={option.value}>
-                          {option.label}
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <img
+                              src={option.label}
+                              alt='anh'
+                              style={{
+                                height: '20px',
+                                width: '20px',
+                                border: '1px solid #ccc',
+                                borderRadius: '50%',
+                                marginRight: '10px'
+                              }}
+                            />
+                            <Typography sx={{ fontSize: '14px' }}>{option.value}</Typography>
+                            <Typography sx={{ fontSize: '14px', color: '#ccc' }}>-{option.value}</Typography>
+                          </Box>
                         </MenuItem>
                       ))}
                     </TextField>
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      id='outlined-select-currency'
-                      select
+                      id='outlined-number'
                       label='Amount'
-                      value={currency}
-                      onChange={handleChange}
-                      helperText='Not enough balance to send! Buy more.'
+                      type='number'
+                      value={values.amount}
+                      onChange={handleChangeValues('amount')}
+                      helperText={`${(values.amount < 0  || values.amount > balance) ? 'Invalid amount' : ''} `}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
                       sx={{ width: '100%' }}
-                    >
-                      {currencies.map(option => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    />
                   </Grid>
                 </Grid>
                 <Paper sx={{ padding: '12px', backgroundColor: '#F8F9FB', marginTop: '15px' }}>
                   <Grid container spacing={5}>
                     <Grid item xs={6}>
-                      <Typography sx={{ fontWeight: 600, fontSize: '13px', display: 'flex', color: '#000' }}>
+                      <Typography sx={{ fontWeight: 600, fontSize: '14px', display: 'flex', color: '#000' }}>
                         <ReportGmailerrorredIcon fontSize='small' />
-                        Your ETH balance is too low
+                        Your MC balance is too low
                       </Typography>
-                      <Typography sx={{ fontSize: '13px', marginTop: '5px' }}>
-                        Every transaction requires a small amount of ETH to execute. Even if you have tokens to swap,
-                        when your ETH balance is close to zero, you won't be able to send anything until you fund your
+                      <Typography sx={{ fontSize: '14px', marginTop: '5px' }}>
+                        Every transaction requires a small amount of MC to execute. Even if you have tokens to swap,
+                        when your MC balance is close to zero, you won't be able to send anything until you fund your
                         account.
                       </Typography>
                     </Grid>
@@ -116,54 +220,57 @@ const SendTX = () => {
                           color: 'var(--green-primary-base)',
                           marginTop: '17px',
                           fontWeight: 600,
-                          fontSize: '13px'
+                          fontSize: '14px'
                         }}
                       >
-                        Transfer ETH from another account
+                        Transfer MC from another account
                       </Button>
                       <Button
                         sx={{
                           textTransform: 'capitalize',
                           color: 'var(--green-primary-base)',
                           fontWeight: 600,
-                          fontSize: '13px'
+                          fontSize: '14px'
                         }}
                       >
-                        Buy ETH
+                        Buy MC
                       </Button>
                     </Grid>
                   </Grid>
                 </Paper>
                 <TextField
-                  id='outlined-select-currency'
-                  select
-                  label='Select'
-                  value={currency}
-                  onChange={handleChange}
+                  id='outlined-search'
+                  label='To address'
+                  placeholder='Enter address'
+                  value={values.toAddress}
+                  onChange={handleChangeValues('toAddress')}
+                  type='search'
                   sx={{ marginTop: '20px', width: '100%' }}
-                >
-                  {currencies.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Typography sx={{ fontWeight: 600, fontSize: '13px', marginTop: '30px' }}>Transaction fee</Typography>
+                />
+                <Typography sx={{ fontWeight: 600, fontSize: '14px', marginTop: '30px' }}>Transaction fee</Typography>
                 <Grid container sx={{ marginTop: '10px' }}>
-                  <Grid item sx={{ fontSize: '13px' }} xs={8}>
-                    <Button sx={{ color: 'var(--green-primary-base)', backgroundColor: '#F8F9FB' }}>
-                      ~$4.10 - 15min
+                  <Grid item sx={{ fontSize: '14px' }} xs={8}>
+                    <Button
+                      sx={{ color: 'var(--green-primary-base)', backgroundColor: '#F8F9FB', marginRight: '10px' }}
+                    >
+                      ~${values.amount*1046*0.0142} - 15min
                     </Button>
-                    0.00145
-                    <Typography sx={{ fontSize: '13px' }}>Not enough ETH to cover network fee. Buy more ETH</Typography>
+                    {values.amount*0.0142}
+                    {/* <Typography sx={{ fontSize: '14px' }}>Not enough MC to cover network fee. Buy more MC</Typography> */}
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography sx={{ fontSize: '13px', float: 'right' }}>Total: 0.001445 ETH</Typography>
-                    <Typography
-                      sx={{ fontSize: '13px', color: 'var(--green-primary-base)', float: 'right', marginTop: '15px' }}
+                    <Typography sx={{ fontSize: '14px', float: 'right' }}>Total: {values.amount*0.0142} MC</Typography>
+                    <button
+                      style={{
+                        fontSize: '14px',
+                        color: 'var(--green-primary-base)',
+                        float: 'right',
+                        marginTop: '15px'
+                      }}
+                      onClick={handleClickOpenDialogOne}
                     >
                       How are fees determind?
-                    </Typography>
+                    </button>
                   </Grid>
                 </Grid>
                 <Accordion sx={{ marginTop: '30px' }}>
@@ -195,28 +302,51 @@ const SendTX = () => {
                     >
                       Reset to default: 21,000
                     </Typography>
-                    <TextField label='Size' id='outlined-size-normal' defaultValue='Normal' sx={{ width: '100%' }} />
                     <TextField
-                      label='Size'
-                      id='outlined-size-normal'
-                      defaultValue='Normal'
-                      sx={{ width: '100%', marginTop: '17px' }}
+                      id='outlined-search'
+                      label='Gas Limit (usually ranges from 21,000 to 500,000)'
+                      defaultValue={'21000'}
+                      type='search'
+                      sx={{ marginTop: '20px', width: '100%' }}
+                    />
+                    <TextField
+                      id='outlined-search'
+                      label='Add data'
+                      defaultValue={'0x'}
+                      type='search'
+                      sx={{ marginTop: '20px', width: '100%' }}
                     />
                   </AccordionDetails>
                 </Accordion>
                 <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '30px', alignItems: 'center' }}>
-                  <Button
+                  {values.amount != 0 && values.toAddress != '' && values.amount > 0  && values.amount < balance ? <Button
                     sx={{
-                      backgroundColor: '#ccc',
+                      backgroundColor: 'var(--green-primary-base)',
                       width: '90px',
                       minHeight: '50px',
                       color: '#fff',
                       textTransform: 'capitalize'
                     }}
+                    onClick={handleSend}
                   >
-                    Next
-                  </Button>
-                  <Button sx={{ color: 'var(--green-primary-base)', textTransform: 'capitalize', marginTop: '15px' }}>
+                    Send
+                  </Button>:
+                  <Button
+                  sx={{
+                    backgroundColor: '#ccc',
+                    width: '90px',
+                    minHeight: '50px',
+                    color: '#fff',
+                    textTransform: 'capitalize'
+                  }}
+                  disabled
+                >
+                  Send
+                </Button>}
+                  <Button
+                    sx={{ color: 'var(--green-primary-base)', textTransform: 'capitalize', marginTop: '15px' }}
+                    onClick={()=>setValues({...values, ['amount']: 0, ['toAddress']: ''})}
+                  >
                     Clear All
                   </Button>
                 </Box>
@@ -225,8 +355,8 @@ const SendTX = () => {
           </Grid>
           <Grid item xs={4}>
             <Network />
-            <Box sx={{marginTop: '20px'}}>
-            <TokenValue />
+            <Box sx={{ marginTop: '20px' }}>
+              <TokenValue />
             </Box>
           </Grid>
         </Grid>
@@ -235,4 +365,4 @@ const SendTX = () => {
   )
 }
 
-export default SendTX
+export default SendTx

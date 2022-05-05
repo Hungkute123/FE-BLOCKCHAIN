@@ -166,7 +166,7 @@ export const KeystoreFile: React.FC<IKeystoreFile> = ({ open, handleClose }) => 
       .then(function (response: any) {
         handleComplete()
         localStorage.setItem('keystoreFile', JSON.stringify(response.data.data))
-        Router.push('/wallet/transaction')
+        Router.push('/wallet/transactions')
       })
       .catch(function (error: any) {
         setAnchor(true)

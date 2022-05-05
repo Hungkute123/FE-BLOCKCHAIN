@@ -63,7 +63,7 @@ export const Header = () => {
                 </PopupState>
               </Grid>
               <Grid item>
-                <Typography sx={{ color: '#fff', fontSize: '14px' }}>Buy ETH</Typography>
+                <Typography sx={{ color: '#fff', fontSize: '14px' }}>Buy MyCoin</Typography>
               </Grid>
             </Grid>
           </Grid>

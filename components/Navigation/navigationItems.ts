@@ -13,6 +13,8 @@ import WidgetsIcon from '@mui/icons-material/Widgets';
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
+import TransformIcon from '@mui/icons-material/Transform';
+import TokenIcon from '@mui/icons-material/Token';
 // ** Type import
 import { VerticalNavItemsType } from '../types'
 
@@ -24,13 +26,13 @@ const navigation = (): VerticalNavItemsType => {
       path: '/wallet/dashboard'
     },
     {
-      title: 'Transaction',
-      icon: HomeOutline,
-      path: '/wallet/transaction'
+      title: 'Transactions',
+      icon: TransformIcon,
+      path: '/wallet/transactions'
     },
     {
       title: 'NFT Manager',
-      icon: HomeOutline,
+      icon: TokenIcon,
       path: '/wallet/nft'
     },
     {
@@ -80,7 +82,7 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Logout',
       icon: LogoutIcon,
       path: '/wallet/logout',
-      openInNewTab: true
+      // openInNewTab: true
     },
 
   ]

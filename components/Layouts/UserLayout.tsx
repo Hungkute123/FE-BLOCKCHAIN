@@ -20,6 +20,7 @@ import VerticalAppBarContent from './AppBarContent'
 // ** Hook Import
 import { useSettings } from '../../hooks/useSettings'
 import Router from 'next/router'
+import { WalletProvider } from '../../context/walletContext'
 
 interface Props {
   children: ReactNode
@@ -38,31 +39,33 @@ const UserLayout = ({ children }: Props) => {
    *  ! Do not change this value unless you know what you are doing. It can break the template.
    */
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
-  useEffect(()=>{
-    const keystoreFile= localStorage.getItem('keystoreFile')
-    if(keystoreFile == null || keystoreFile == undefined || keystoreFile == ''){
+  useEffect(() => {
+    const keystoreFile = localStorage.getItem('keystoreFile')
+    if (keystoreFile == null || keystoreFile == undefined || keystoreFile == '') {
       Router.push('/wallet/create')
     }
   })
   return (
-    <VerticalLayout
-      hidden={hidden}
-      settings={settings}
-      saveSettings={saveSettings}
-      verticalNavItems={VerticalNavItems()} // Navigation Items
-      verticalAppBarContent={(
-        props // AppBar Content
-      ) => (
-        <VerticalAppBarContent
-          hidden={hidden}
-          settings={settings}
-          saveSettings={saveSettings}
-          toggleNavVisibility={props.toggleNavVisibility}
-        />
-      )}
-    >
-      {children}
-    </VerticalLayout>
+    <WalletProvider>
+      <VerticalLayout
+        hidden={hidden}
+        settings={settings}
+        saveSettings={saveSettings}
+        verticalNavItems={VerticalNavItems()} // Navigation Items
+        verticalAppBarContent={(
+          props // AppBar Content
+        ) => (
+          <VerticalAppBarContent
+            hidden={hidden}
+            settings={settings}
+            saveSettings={saveSettings}
+            toggleNavVisibility={props.toggleNavVisibility}
+          />
+        )}
+      >
+        {children}
+      </VerticalLayout>
+    </WalletProvider>
   )
 }
 

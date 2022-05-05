@@ -78,14 +78,23 @@ const Access = () => {
           Please select a method to access your wallet.
         </Typography>
         <Typography sx={{ fontSize: '1.143', fontWeight: 400, marginBottom: '20px', color: '#fff' }}>
-          Don't have a wallet? <Link href='/wallet/create'>
+          Don't have a wallet?{' '}
+          <Link href='/wallet/create'>
             <a style={{ color: 'var(--green-primary-base)' }}> Create Wallet</a>
           </Link>
         </Typography>
         {methodCreateWallet.map((item: any, index: number) => {
           switch (index) {
             case 4:
-              return <CardItem key={item.id} item={item} onClick={handleClickOpenSoftwareDialog} />
+              return (
+                <CardItem
+                  key={item.id}
+                  item={item}
+                  onClick={handleClickOpenSoftwareDialog}
+                  backgroundColor='transparent'
+                  color='#fff'
+                />
+              )
             default:
               return <CardItem key={item.id} item={item} />
           }
