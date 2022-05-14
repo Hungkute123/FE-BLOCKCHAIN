@@ -48,7 +48,7 @@ const SendTx = () => {
   const [currency, setCurrency] = useState('MC')
   const [values, setValues] = useState({
     amount: 0,
-    toAddress: '',
+    toAddress: ''
   })
   useEffect(() => {
     console.log(wallet.publicKey)
@@ -89,22 +89,16 @@ const SendTx = () => {
         toAddress: values.toAddress,
         fromAddress: publicKey,
         amount: values.amount,
-        txFee: values.amount*0.0142
+        txFee: values.amount * 0.0142
       })
       .then(function (response: any) {
+        axios
+          .get(`${process.env.URL_MY_API}wallet/tx/mining?wallet=${publicKey}`)
+          .then(function (response: any) {})
+          .catch(function (error: any) {})
         Router.push('/wallet/transactions')
       })
-      .catch(function (error: any) {
-        console.log(error)
-      })
-      axios
-      .get(`${process.env.URL_MY_API}wallet/tx/mining?wallet=${publicKey}`)
-      .then(function (response: any) {
-        console.log(response)
-      })
-      .catch(function (error: any) {
-        console.log(error)
-      })
+      .catch(function (error: any) {})
   }
   return (
     <div style={{ backgroundColor: 'var(--gray-primary-base)', width: '100%' }}>
@@ -192,7 +186,7 @@ const SendTx = () => {
                       type='number'
                       value={values.amount}
                       onChange={handleChangeValues('amount')}
-                      helperText={`${(values.amount < 0  || values.amount > balance) ? 'Invalid amount' : ''} `}
+                      helperText={`${values.amount < 0 || values.amount > balance ? 'Invalid amount' : ''} `}
                       InputLabelProps={{
                         shrink: true
                       }}
@@ -253,13 +247,15 @@ const SendTx = () => {
                     <Button
                       sx={{ color: 'var(--green-primary-base)', backgroundColor: '#F8F9FB', marginRight: '10px' }}
                     >
-                      ~${values.amount*1046*0.0142} - 15min
+                      ~${values.amount * 1046 * 0.0142} - 15min
                     </Button>
-                    {values.amount*0.0142}
+                    {values.amount * 0.0142}
                     {/* <Typography sx={{ fontSize: '14px' }}>Not enough MC to cover network fee. Buy more MC</Typography> */}
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography sx={{ fontSize: '14px', float: 'right' }}>Total: {values.amount*0.0142} MC</Typography>
+                    <Typography sx={{ fontSize: '14px', float: 'right' }}>
+                      Total: {values.amount * 0.0142} MC
+                    </Typography>
                     <button
                       style={{
                         fontSize: '14px',
@@ -319,33 +315,36 @@ const SendTx = () => {
                   </AccordionDetails>
                 </Accordion>
                 <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '30px', alignItems: 'center' }}>
-                  {values.amount != 0 && values.toAddress != '' && values.amount > 0  && values.amount < balance ? <Button
-                    sx={{
-                      backgroundColor: 'var(--green-primary-base)',
-                      width: '90px',
-                      minHeight: '50px',
-                      color: '#fff',
-                      textTransform: 'capitalize'
-                    }}
-                    onClick={handleSend}
-                  >
-                    Send
-                  </Button>:
-                  <Button
-                  sx={{
-                    backgroundColor: '#ccc',
-                    width: '90px',
-                    minHeight: '50px',
-                    color: '#fff',
-                    textTransform: 'capitalize'
-                  }}
-                  disabled
-                >
-                  Send
-                </Button>}
+                  {values.amount != 0 && values.toAddress != '' && values.amount > 0 && values.amount < balance ? (
+                    <Button
+                      sx={{
+                        backgroundColor: 'var(--green-primary-base)',
+                        width: '90px',
+                        minHeight: '50px',
+                        color: '#fff',
+                        textTransform: 'capitalize'
+                      }}
+                      onClick={handleSend}
+                    >
+                      Send
+                    </Button>
+                  ) : (
+                    <Button
+                      sx={{
+                        backgroundColor: '#ccc',
+                        width: '90px',
+                        minHeight: '50px',
+                        color: '#fff',
+                        textTransform: 'capitalize'
+                      }}
+                      disabled
+                    >
+                      Send
+                    </Button>
+                  )}
                   <Button
                     sx={{ color: 'var(--green-primary-base)', textTransform: 'capitalize', marginTop: '15px' }}
-                    onClick={()=>setValues({...values, ['amount']: 0, ['toAddress']: ''})}
+                    onClick={() => setValues({ ...values, ['amount']: 0, ['toAddress']: '' })}
                   >
                     Clear All
                   </Button>

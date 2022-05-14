@@ -111,7 +111,7 @@ const VerticalNavHeader = (props: Props) => {
 
     setOpen(false)
   }
-
+  
   return (
     <MenuHeaderWrapper className='nav-header' sx={{ pl: 6, width: '296px' }}>
       {userVerticalNavMenuBranding ? (
